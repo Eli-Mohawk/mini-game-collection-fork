@@ -3,14 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
-/// dynamic health bar
-/// jump
-/// attack chain
-/// attack type (up/down/right/left)
-/// attack hitboxes
-/// game timer
-
-
 namespace MiniGameCollection.Games2026.Team02
 {
     public class GameMaster : MiniGameBehaviour
@@ -23,6 +15,7 @@ namespace MiniGameCollection.Games2026.Team02
 
         public void Update()
         {
+            // displays player health as a string on screen
             player1Health.text = player1.playerHealth.ToString();
             player2Health.text = player2.playerHealth.ToString();
         }
