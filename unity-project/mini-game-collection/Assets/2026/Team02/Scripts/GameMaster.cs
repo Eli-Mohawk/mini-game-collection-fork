@@ -3,6 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
+/// to-do
+/// lose/win mechanic | either opponent hits zero hp or the one with more hp when time runs out
+/// finish attacks
+/// stuns
+/// knockback on hits
+/// combo breaker
+/// dodge
+/// 
+
 namespace MiniGameCollection.Games2026.Team02
 {
     public class GameMaster : MiniGameBehaviour
