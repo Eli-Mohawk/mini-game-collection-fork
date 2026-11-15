@@ -554,8 +554,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <MiniGameManager>k__BackingField: {fileID: 0}
   targetLocation: {fileID: 587992361}
-  player1: {fileID: 831700489}
-  player2: {fileID: 1721407528}
 --- !u!70 &251988731
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -728,8 +726,8 @@ Camera:
   m_GameObject: {fileID: 565850667}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0.21960786, g: 0.21960786, b: 0.21960786, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -877,8 +875,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <MiniGameManager>k__BackingField: {fileID: 0}
   targetLocation: {fileID: 251988733}
-  player1: {fileID: 831700489}
-  player2: {fileID: 1721407528}
 --- !u!70 &587992363
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -1015,8 +1011,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <MiniGameManager>k__BackingField: {fileID: 0}
   targetLocation: {fileID: 807797666}
-  player1: {fileID: 831700489}
-  player2: {fileID: 1721407528}
 --- !u!70 &800172956
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -1186,8 +1180,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <MiniGameManager>k__BackingField: {fileID: 0}
   targetLocation: {fileID: 800172954}
-  player1: {fileID: 831700489}
-  player2: {fileID: 1721407528}
 --- !u!70 &807797668
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -1287,6 +1279,7 @@ GameObject:
   - component: {fileID: 831700486}
   - component: {fileID: 831700487}
   - component: {fileID: 831700489}
+  - component: {fileID: 831700492}
   - component: {fileID: 831700488}
   - component: {fileID: 831700490}
   - component: {fileID: 831700491}
@@ -1355,7 +1348,7 @@ SpriteRenderer:
   m_SortingOrder: 0
   m_Sprite: {fileID: -9095717837082945937, guid: 207ee8102dd4143d288186ef0be518ee,
     type: 3}
-  m_Color: {r: 0.6650944, g: 1, b: 0.83314747, a: 1}
+  m_Color: {r: 0.29966182, g: 0.46884432, b: 0.6981132, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -1407,11 +1400,11 @@ MonoBehaviour:
   <MiniGameManager>k__BackingField: {fileID: 0}
   moveSpeed: 8
   jumpHeight: 15
+  isGrounded: 0
   playerHealth: 100
-  playerDamage: 10
-  attackCooldownMax: 0.5
   playerID: 0
   rb2d: {fileID: 831700488}
+  combatSystem: {fileID: 0}
   portalCooldownMax: 1
   portalCooldown: 0
   freeze: 0
@@ -1497,6 +1490,21 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1.5, y: 2.5}
   m_EdgeRadius: 0
+--- !u!114 &831700492
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 831700485}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b603cdbf08b7b641b54b1d2d5571838, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <MiniGameManager>k__BackingField: {fileID: 0}
+  playerID: 0
+  stunTime: 0
 --- !u!1 &996611557
 GameObject:
   m_ObjectHideFlags: 0
@@ -2048,6 +2056,7 @@ GameObject:
   - component: {fileID: 1721407525}
   - component: {fileID: 1721407526}
   - component: {fileID: 1721407528}
+  - component: {fileID: 1721407531}
   - component: {fileID: 1721407527}
   - component: {fileID: 1721407529}
   - component: {fileID: 1721407530}
@@ -2168,11 +2177,11 @@ MonoBehaviour:
   <MiniGameManager>k__BackingField: {fileID: 0}
   moveSpeed: 8
   jumpHeight: 15
+  isGrounded: 0
   playerHealth: 100
-  playerDamage: 10
-  attackCooldownMax: 0.5
   playerID: 1
   rb2d: {fileID: 1721407527}
+  combatSystem: {fileID: 0}
   portalCooldownMax: 1
   portalCooldown: 0
   freeze: 0
@@ -2258,6 +2267,21 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1.5, y: 2.5}
   m_EdgeRadius: 0
+--- !u!114 &1721407531
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1721407524}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b603cdbf08b7b641b54b1d2d5571838, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <MiniGameManager>k__BackingField: {fileID: 0}
+  playerID: 1
+  stunTime: 0
 --- !u!1 &1832344855
 GameObject:
   m_ObjectHideFlags: 0
