@@ -8,9 +8,6 @@ namespace MiniGameCollection.Games2026.Team02
     {
         [SerializeField] private Transform targetLocation;
 
-        [SerializeField] private PlayerController player1;
-        [SerializeField] private PlayerController player2;
-
         private void OnTriggerEnter2D(Collider2D collision)
         {
             // sets player to whichever player collides with the portal
