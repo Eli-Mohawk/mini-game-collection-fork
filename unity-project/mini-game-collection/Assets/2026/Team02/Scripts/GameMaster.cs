@@ -10,7 +10,7 @@ using TMPro;
 /// knockback on hits
 /// combo breaker
 /// dodge
-/// 
+/// change kb to stun type
 
 namespace MiniGameCollection.Games2026.Team02
 {

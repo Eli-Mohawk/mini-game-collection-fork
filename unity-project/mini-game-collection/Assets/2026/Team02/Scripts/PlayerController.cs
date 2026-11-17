@@ -39,6 +39,7 @@ namespace MiniGameCollection.Games2026.Team02
         public void Start()
         {
             Physics2D.gravity = new Vector2(0, -9.81f); // sets the universal gravity to unity's default
+            combatSystem = new CombatSystem();
         }
 
         public void Update()
@@ -53,6 +54,8 @@ namespace MiniGameCollection.Games2026.Team02
 
         private void PlayerControls()
         {
+            if (combatSystem.stunned) return;
+
             // freeze is in place to make a buffer after teleporting for better movement control
             if (!freeze) // not frozen is default
             {
