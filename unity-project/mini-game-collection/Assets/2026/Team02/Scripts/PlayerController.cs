@@ -11,33 +11,30 @@ namespace MiniGameCollection.Games2026.Team02
 {
     public class PlayerController : MiniGameBehaviour
     {
+        #region Variables
         // movement & jump variables
         [SerializeField] private float moveSpeed;
         [SerializeField] private float jumpHeight;
-        private bool isGrounded;
+        public bool isGrounded;
 
-        public int playerHealth;
-
-        // attack related variables
-        [SerializeField] private int playerDamage;
-        [SerializeField] private float attackCooldownMax;
-        private float attackCooldown = 0;
-        private bool isAttackable;
+        public float playerHealth;
 
         // object related variables
-        private PlayerController opponent;
         public PlayerID playerID;
         public Rigidbody2D rb2d;
+        public CombatSystem combatSystem;
 
         // portal cooldown variables
         public float portalCooldownMax;
         public float portalCooldown = 0;
 
+        // portal movement lock variables
         public bool freeze;
         public float freezeMax;
         public float freezeLength = 0;
 
         private bool lose;
+        #endregion
 
         public void Start()
         {
@@ -49,7 +46,6 @@ namespace MiniGameCollection.Games2026.Team02
             PlayerControls();
             HealthSystem();
             #region Timers
-            if (attackCooldown > 0) attackCooldown -= Time.deltaTime;
             if (portalCooldown > 0) portalCooldown -= Time.deltaTime;
             if (freezeLength > 0) freezeLength -= Time.deltaTime;
             #endregion
@@ -75,7 +71,6 @@ namespace MiniGameCollection.Games2026.Team02
                 freeze = false;
             }
 
-            if (ArcadeInput.Players[(int)playerID].Action1.Pressed) CombatSystem();
             if (ArcadeInput.Players[(int)playerID].Action2.Pressed && isGrounded)
             {
                 rb2d.velocity = new Vector2(rb2d.velocity.x, jumpHeight);
@@ -108,33 +103,6 @@ namespace MiniGameCollection.Games2026.Team02
                 lose = true;
             }
         }
-
-        private void CombatSystem()
-        {
-            if (attackCooldown <= 0)
-            {
-                if (isAttackable) opponent.playerHealth -= playerDamage;
-                attackCooldown = attackCooldownMax;
-            }
-        }
-
-        // detects other objects with this script (aka players) an object that can be interacted with
-        #region OpponentDetection
-        private void OnTriggerEnter2D(Collider2D Collision)
-        {
-            opponent = Collision.GetComponent<PlayerController>();
-            if (opponent != null) isAttackable = true;
-        }
-
-        private void OnTriggerExit2D(Collider2D collision)
-        {
-            if (collision.GetComponent<PlayerController>() == opponent)
-            {
-                opponent = null;
-                isAttackable = false;
-            }
-        }
-        #endregion
 
         private void OnValidate()
         {
