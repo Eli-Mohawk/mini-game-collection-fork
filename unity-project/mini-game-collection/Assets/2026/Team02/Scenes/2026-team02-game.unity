@@ -4680,7 +4680,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 3
   m_Sprite: {fileID: -9095717837082945937, guid: 207ee8102dd4143d288186ef0be518ee,
     type: 3}
   m_Color: {r: 0.29966182, g: 0.46884432, b: 0.6981132, a: 1}
@@ -4839,7 +4839,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <MiniGameManager>k__BackingField: {fileID: 0}
   playerID: 0
+  cds:
+  - 0.5
+  - 0.5
+  - 0.7
+  - 2
+  - 0.5
+  - 0.6
   stunTime: 0
+  stunned: 0
+  kb: 5
+  kbMult:
+  - 0.5
+  - 0.3
+  - 0.8
+  - 1.4
+  - 4
+  - 5
+  damage: 10
+  damageMult:
+  - 0.6
+  - 0.4
+  - 0.8
+  - 1.1
+  - 0.9
+  - 1
 --- !u!1 &967185184
 GameObject:
   m_ObjectHideFlags: 0
@@ -8753,7 +8777,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 3
   m_Sprite: {fileID: -9095717837082945937, guid: 207ee8102dd4143d288186ef0be518ee,
     type: 3}
   m_Color: {r: 0.8773585, g: 0.68284976, b: 0.68284976, a: 1}
@@ -8912,7 +8936,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <MiniGameManager>k__BackingField: {fileID: 0}
   playerID: 1
+  cds:
+  - 0.5
+  - 0.5
+  - 0.7
+  - 2
+  - 0.5
+  - 0.6
   stunTime: 0
+  stunned: 0
+  kb: 2
+  kbMult:
+  - 0.5
+  - 0.3
+  - 0.8
+  - 1.4
+  - 4
+  - 5
+  damage: 5
+  damageMult:
+  - 0.6
+  - 0.4
+  - 0.8
+  - 1.1
+  - 0.9
+  - 1
 --- !u!1 &1770385614
 GameObject:
   m_ObjectHideFlags: 0

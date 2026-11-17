@@ -1,9 +1,11 @@
 using MiniGameCollection.Games2025.Team00;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem.Controls;
 
@@ -18,36 +20,30 @@ namespace MiniGameCollection.Games2026.Team02
         PlayerController opponent;
 
         // attack variables
-        private float attackCD; // cooldown from ending a combo until you can attack again
-        private float attackResetDT; // delta time left until you can attack after finishing combo
         private bool hitable; // can you deal damage
         private int comboCount; // what stage of the combo you are on
-        private int comboMax = 4; // max amount of hits in a combo
-        private float comboResetCD = 2f; // cooldown after hitting with a combo attack until the combo is reset to 0
-        private float comboResetDT; // delta time left until combo is reset
+        private int comboMax = 3; // max amount of hits in a combo -1 (for math)
 
         // attack cooldown variables
-        private float comboCD1; // cooldown after hit 1 in combo
-        private float comboCD2; // cooldow after hit 2 in combo
-        private float comboCD3; // cooldown after hit 3 in combo
-        private float upCD = 0.4f; // cooldown after up attack
-        private float downCD; // cooldown after down attack
-        private float attackDT; // delta time left for attack cooldowns
+        private float attackResetDT; // delta time left until you can attack after finishing combo
+        private float comboResetDT; // delta time left until combo is reset
+        private float attackDT; // delta time left between attacks in combo
+        [SerializeField] private float[] cds = { 0.5f, 0.5f, 0.7f, 2f, 0.5f, 0.6f }; // combo 1, 2, 3, 4/reset, up, down
 
         // stun variables
         [SerializeField] private float stunTime; // duration of stun
         private float stunDT; // delta time left of stun
-        private bool stunned = false; // are they stunned
+        public bool stunned = false; // are they stunned
+
+        // knockback variables
+        [SerializeField] private float kb = 5; // kbockback applied to opponent
+        private float trueKB; // final knockback applied
+        [SerializeField] private float[] kbMult = {0.5f, 0.3f, 0.8f, 1.4f, 4f, 5f}; // combo 1, 2, 3, 4, up, down
 
         // damage calculations
-        private float damage = 5f; // base damage
+        [SerializeField] private float damage = 5f; // base damage
         private float trueDamage; // actuall damage dealt
-        private float comboMult1 = 0.6f; // combo hit 1 damage multiplier
-        private float comboMult2 = 0.4f; // combo hit 2 damage multiplier
-        private float comboMult3 = 0.8f; // combo hit 3 damage multiplier
-        private float comboMult4 = 1.1f; // combo hit 4 damage multiplier
-        private float upMult = 0.9f; // up attack damage multiplier
-        private float downMult = 1f; // down attack damage multiplier
+        [SerializeField] private float[] damageMult = {0.6f, 0.4f, 0.8f, 1.1f, 0.9f, 1f}; // combo 1, 2, 3, 4, up, down
 
         private bool actionWasPressed;
 
@@ -71,6 +67,7 @@ namespace MiniGameCollection.Games2026.Team02
             if (actionPressed && !actionWasPressed) Attack();
             actionWasPressed = actionPressed;
 
+            Debug.Log(hitable);
         }
 
         private bool Cooldown()
@@ -87,121 +84,96 @@ namespace MiniGameCollection.Games2026.Team02
         public void Attack()
         {
             if (stunned) return;
-            
+
             // attack types
-            if (axisY == -1 && !player.isGrounded) DownAttack();
-            if (axisY == 1) UpAttack();
             if (axisY == 0) BaseAttack();
+            if (axisY == 1) UpAttack();
+            if (axisY == -1 && !player.isGrounded) DownAttack();
         }
 
         private void BaseAttack()
         {
             if (Cooldown()) return;
 
-            if (comboCount == 0)
-            {
-                trueDamage = damage * comboMult1;
-
-                attackCD = comboCD1;
-
-                if (opponent == null) return;
-
-                opponent.playerHealth -= trueDamage;
-
-            }
-            if (comboCount == 1)
-            {
-                trueDamage = damage * comboMult2;
-
-                attackCD = comboCD2;
-
-                if (opponent == null) return;
-
-                opponent.playerHealth -= trueDamage;
-            }
-            if (comboCount == 2)
-            {
-                trueDamage = damage * comboMult3;
-
-                attackCD = comboCD3;
-
-                if (opponent == null) return;
-
-                opponent.playerHealth -= trueDamage;
-            }
-            if (comboCount == 3)
-            {
-                trueDamage = damage * comboMult4;
-
-                attackResetDT = attackCD;
-
-                if (opponent == null) return;
-
-                opponent.playerHealth -= trueDamage;
-            }
+            trueDamage = damage * damageMult[comboCount];
+            trueKB = kb * kbMult[comboCount];
+            Combo();
         }
 
-        private void DownAttack()
+        private void Combo()
         {
-            trueDamage = damage * downMult;
+            attackDT = cds[comboCount];
+            comboResetDT = cds[3];
 
-            if (Cooldown()) return;
+            if (comboCount < comboMax) comboCount++;
+            if (comboCount >= comboMax) comboCount = 0;
+            if (comboResetDT == 0) comboCount = 0;
 
-            player.rb2d.velocity = new Vector2(player.rb2d.velocity.x, 0);
-            player.rb2d.velocity = new Vector2(player.rb2d.velocity.x, player.rb2d.velocity.y - 16);
-
-            attackDT = upCD;
-            comboResetDT = comboResetCD;
-            comboCount = 2;
-
-            if (opponent == null) return;
+            if (!hitable) return;
 
             opponent.playerHealth -= trueDamage;
-
-            opponent.rb2d.velocity = new Vector2(opponent.rb2d.velocity.x, opponent.rb2d.velocity.y - 16);
+            opponent.rb2d.velocity = new Vector2(opponent.rb2d.velocity.x + trueKB, opponent.rb2d.velocity.y);
         }
 
         private void UpAttack()
         {
-            trueDamage = damage * upMult; // damage multiplied by attack amount
+            trueDamage = damage * damageMult[4]; // damage multiplied by attack amount
+            trueKB = kb * kbMult[4]; // damage multiplied by knockback
 
             if (Cooldown()) return; // check if the player is on cooldown or not
 
             player.rb2d.velocity = new Vector2(player.rb2d.velocity.x, 0); // resets y velocity when you attack
 
             // cooldowns & combo updates
-            attackDT = upCD;
-            comboResetDT = comboResetCD;
+            attackDT = cds[4];
+            comboResetDT = cds[3];
             comboCount = 3;
 
-            if (opponent == null) return; // only does the following if actually hitting the enemy
+            if (!hitable) return; // only does the following if actually hitting the enemy
             
             opponent.playerHealth -= trueDamage;
 
             // makes both player go up into the air
-            player.rb2d.velocity = new Vector2(player.rb2d.velocity.x, player.rb2d.velocity.y + 16);
-            opponent.rb2d.velocity = new Vector2(opponent.rb2d.velocity.x, opponent.rb2d.velocity.y + 16);
-            
+            player.rb2d.velocity = new Vector2(player.rb2d.velocity.x, player.rb2d.velocity.y + trueKB);
+            opponent.rb2d.velocity = new Vector2(opponent.rb2d.velocity.x, opponent.rb2d.velocity.y + trueKB);
+
+        }
+
+        private void DownAttack()
+        {
+            trueDamage = damage * damageMult[5];
+            trueKB = kb * kbMult[5];
+
+            if (Cooldown()) return;
+
+            player.rb2d.velocity = new Vector2(player.rb2d.velocity.x, player.rb2d.velocity.y - trueKB);
+
+            attackDT = cds[5];
+            comboResetDT = cds[3];
+            comboCount = 2;
+
+            if (!hitable) return;
+
+            opponent.playerHealth -= trueDamage;
+
+            opponent.rb2d.velocity = new Vector2(opponent.rb2d.velocity.x, opponent.rb2d.velocity.y - trueKB);
         }
 
         private void Stun()
         {
-
+            
         }
 
         private void OnTriggerEnter2D(Collider2D Collision)
         {
-            opponent = Collision.GetComponent<PlayerController>();
+            if (opponent == null) opponent = Collision.GetComponent<PlayerController>();
+            
             if (opponent != null) hitable = true;
         }
 
         private void OnTriggerExit2D(Collider2D collision)
         {
-            if (collision.GetComponent<PlayerController>() == opponent)
-            {
-                opponent = null;
-                hitable = false;
-            }
+            if (collision.GetComponent<PlayerController>() == opponent) hitable = false;
         }
     }
 }
