@@ -7,11 +7,10 @@ using UnityEngine;
 
 public class Team04PickUpZone : MiniGameBehaviour
 {
-    private BoxCollider2D boxCollider;
 
     private void OnValidate()
     {
-        boxCollider = GetComponent<BoxCollider2D>();
+        
     }
 
     private void Update()
