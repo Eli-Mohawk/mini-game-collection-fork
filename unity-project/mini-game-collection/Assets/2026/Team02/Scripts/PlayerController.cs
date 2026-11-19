@@ -54,7 +54,7 @@ namespace MiniGameCollection.Games2026.Team02
 
         private void PlayerControls()
         {
-            if (combatSystem.stunned) return;
+            if (combatSystem.Stun()) return;
 
             // freeze is in place to make a buffer after teleporting for better movement control
             if (!freeze) // not frozen is default
@@ -62,8 +62,6 @@ namespace MiniGameCollection.Games2026.Team02
                 float axisX = ArcadeInput.Players[(int)playerID].AxisX; // gets player input for each player
                 float movement = axisX * Time.deltaTime * moveSpeed;
                 rb2d.velocity = new Vector2(axisX * moveSpeed, rb2d.velocity.y); // gives velocity based on movement direction & set speed
-
-                
             }
             else if (freeze) // after using a portal you stop movement
             {

@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using MiniGameCollection.Games2025.Team00;
 using System;
 using System.Collections;
@@ -18,6 +19,7 @@ namespace MiniGameCollection.Games2026.Team02
         PlayerController player;
         float axisY;
         PlayerController opponent;
+        CombatSystem opponent2;
 
         // attack variables
         private bool hitable; // can you deal damage
@@ -32,8 +34,7 @@ namespace MiniGameCollection.Games2026.Team02
 
         // stun variables
         [SerializeField] private float stunTime; // duration of stun
-        private float stunDT; // delta time left of stun
-        public bool stunned = false; // are they stunned
+        public float stunDT; // delta time left of stun
 
         // knockback variables
         [SerializeField] private float kb = 5; // kbockback applied to opponent
@@ -68,6 +69,7 @@ namespace MiniGameCollection.Games2026.Team02
             actionWasPressed = actionPressed;
 
             Debug.Log(hitable);
+            Debug.Log(stunDT);
         }
 
         private bool Cooldown()
@@ -83,7 +85,7 @@ namespace MiniGameCollection.Games2026.Team02
 
         public void Attack()
         {
-            if (stunned) return;
+            if (Stun()) return;
 
             // attack types
             if (axisY == 0) BaseAttack();
@@ -111,6 +113,7 @@ namespace MiniGameCollection.Games2026.Team02
 
             if (!hitable) return;
 
+            opponent2.stunDT = stunTime;
             opponent.playerHealth -= trueDamage;
             opponent.rb2d.velocity = new Vector2(opponent.rb2d.velocity.x + trueKB, opponent.rb2d.velocity.y);
         }
@@ -130,7 +133,8 @@ namespace MiniGameCollection.Games2026.Team02
             comboCount = 3;
 
             if (!hitable) return; // only does the following if actually hitting the enemy
-            
+
+            opponent2.stunDT = stunTime;
             opponent.playerHealth -= trueDamage;
 
             // makes both player go up into the air
@@ -154,19 +158,26 @@ namespace MiniGameCollection.Games2026.Team02
 
             if (!hitable) return;
 
+            opponent2.stunDT = stunTime;
             opponent.playerHealth -= trueDamage;
 
             opponent.rb2d.velocity = new Vector2(opponent.rb2d.velocity.x, opponent.rb2d.velocity.y - trueKB);
         }
 
-        private void Stun()
+        public bool Stun()
         {
-            
+            bool stunned;
+
+            if (stunDT > 0) stunned = true;
+            else stunned = false;
+
+            return stunned;
         }
 
         private void OnTriggerEnter2D(Collider2D Collision)
         {
             if (opponent == null) opponent = Collision.GetComponent<PlayerController>();
+            if (opponent2 == null) opponent2 = Collision.GetComponent<CombatSystem>();
             
             if (opponent != null) hitable = true;
         }

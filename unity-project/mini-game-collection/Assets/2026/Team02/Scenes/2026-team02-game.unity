@@ -4977,8 +4977,8 @@ MonoBehaviour:
   - 2
   - 0.5
   - 0.6
-  stunTime: 0
-  stunned: 0
+  stunTime: 3
+  stunDT: 0
   kb: 5
   kbMult:
   - 0.5
@@ -8828,7 +8828,7 @@ MonoBehaviour:
   - 0.5
   - 0.6
   stunTime: 0
-  stunned: 0
+  stunDT: 0
   kb: 2
   kbMult:
   - 0.5
