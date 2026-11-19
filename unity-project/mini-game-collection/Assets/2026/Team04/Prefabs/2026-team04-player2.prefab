@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4771502150873782844}
   - component: {fileID: 3576846713965420511}
   - component: {fileID: 8230349155369989265}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Pickup Box
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -104,9 +104,9 @@ GameObject:
   - component: {fileID: 7434066836325410151}
   - component: {fileID: 489599335925217540}
   - component: {fileID: -4271440856562982505}
-  m_Layer: 0
-  m_Name: 2026-team04-player
-  m_TagString: Untagged
+  m_Layer: 11
+  m_Name: 2026-team04-player2
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -147,7 +147,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 033ca39f8ac916544aa8f3ce967f64ad, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -265,7 +265,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <MiniGameManager>k__BackingField: {fileID: 0}
-  PlayerID: 0
+  PlayerID: 1
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
