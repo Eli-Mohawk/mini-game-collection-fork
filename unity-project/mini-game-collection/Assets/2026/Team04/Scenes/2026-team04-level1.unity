@@ -3915,6 +3915,18 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4b04588c16c0d4b4aa5d6943b8397154, type: 3}
+--- !u!114 &1915067146 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5869835555178339183, guid: 4b04588c16c0d4b4aa5d6943b8397154,
+    type: 3}
+  m_PrefabInstance: {fileID: 1632687586}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 117d8ae666d785c43bd8ea8abb642ab8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1999691853
 GameObject:
   m_ObjectHideFlags: 0
@@ -4093,7 +4105,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 6556832142336821272, guid: a6b27c75e225c1a4597553c4c3783c84,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6556832142336821272, guid: a6b27c75e225c1a4597553c4c3783c84,
+        type: 3}
+      propertyPath: <MiniGameManager>k__BackingField
+      value: 
+      objectReference: {fileID: 1915067146}
+    m_RemovedComponents:
+    - {fileID: 6556832142336821272, guid: a6b27c75e225c1a4597553c4c3783c84, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
