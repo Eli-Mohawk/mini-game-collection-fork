@@ -6,12 +6,9 @@ using TMPro;
 /// to-do
 /// lose/win mechanic | either opponent hits zero hp or the one with more hp when time runs out
 /// fix attacks
-/// stuns
-/// knockback on hits
 /// combo breaker
 /// dodge
 /// change kb to stun type
-/// fix hitboxes behind tilemap
 
 namespace MiniGameCollection.Games2026.Team02
 {

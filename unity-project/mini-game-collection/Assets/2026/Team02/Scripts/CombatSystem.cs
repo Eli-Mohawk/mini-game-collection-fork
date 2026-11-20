@@ -16,10 +16,10 @@ namespace MiniGameCollection.Games2026.Team02
     {
         // external variables
         public PlayerID playerID;
-        PlayerController player;
-        float axisY;
-        PlayerController opponent;
-        CombatSystem opponent2;
+        private PlayerController player;
+        private float axisY;
+        private PlayerController opponent;
+        private CombatSystem opponent2;
 
         // attack variables
         private bool hitable; // can you deal damage
@@ -33,8 +33,8 @@ namespace MiniGameCollection.Games2026.Team02
         [SerializeField] private float[] cds = { 0.5f, 0.5f, 0.7f, 2f, 0.5f, 0.6f }; // combo 1, 2, 3, 4/reset, up, down
 
         // stun variables
-        [SerializeField] private float stunTime; // duration of stun
-        public float stunDT; // delta time left of stun
+        [SerializeField] private float stunTime = 1f; // duration of stun
+        [NonSerialized] public float stunDT; // delta time left of stun
 
         // knockback variables
         [SerializeField] private float kb = 5; // kbockback applied to opponent
@@ -67,9 +67,6 @@ namespace MiniGameCollection.Games2026.Team02
             bool actionPressed = (ArcadeInput.Players[(int)playerID].Action1.Pressed);
             if (actionPressed && !actionWasPressed) Attack();
             actionWasPressed = actionPressed;
-
-            Debug.Log(hitable);
-            Debug.Log(stunDT);
         }
 
         private bool Cooldown()
