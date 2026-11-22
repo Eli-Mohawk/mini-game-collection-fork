@@ -18,6 +18,8 @@ namespace MiniGameCollection.Games2026.Team02
         public PlayerID playerID;
         private PlayerController player;
         private float axisY;
+        private float axisX;
+        private float lastX;
         private PlayerController opponent;
         private CombatSystem opponent2;
 
@@ -27,24 +29,27 @@ namespace MiniGameCollection.Games2026.Team02
         private int comboMax = 3; // max amount of hits in a combo -1 (for math)
 
         // attack cooldown variables
-        private float attackResetDT; // delta time left until you can attack after finishing combo
         private float comboResetDT; // delta time left until combo is reset
         private float attackDT; // delta time left between attacks in combo
-        [SerializeField] private float[] cds = { 0.5f, 0.5f, 0.7f, 2f, 0.5f, 0.6f }; // combo 1, 2, 3, 4/reset, up, down
+        private float[] cds = { 0.3f, 0.4f, 0.8f, 2f, 1.1f, 1.1f }; // combo 1, 2, 3, 4/reset, up, down
 
         // stun variables
-        [SerializeField] private float stunTime = 1f; // duration of stun
+        private float stunTime = 1f; // duration of stun
         [NonSerialized] public float stunDT; // delta time left of stun
 
         // knockback variables
-        [SerializeField] private float kb = 5; // kbockback applied to opponent
+        private float kb = 1; // kbockback applied
         private float trueKB; // final knockback applied
-        [SerializeField] private float[] kbMult = {0.5f, 0.3f, 0.8f, 1.4f, 4f, 5f}; // combo 1, 2, 3, 4, up, down
+        private float[] kbMult = {6.5f, 12.5f, 15f}; // combo 4, up, down
 
         // damage calculations
-        [SerializeField] private float damage = 5f; // base damage
+        private float damage = 5f; // base damage
         private float trueDamage; // actuall damage dealt
-        [SerializeField] private float[] damageMult = {0.6f, 0.4f, 0.8f, 1.1f, 0.9f, 1f}; // combo 1, 2, 3, 4, up, down
+        private float[] damageMult = {0.5f, 0.3f, 0.7f, 1.5f, 1f, 1f}; // combo 1, 2, 3, 4, up, down
+
+        // counter-attack variables
+        [NonSerialized] public int counterTokens;
+        private int counterTokenCap = 2;
 
         private bool actionWasPressed;
 
@@ -56,17 +61,23 @@ namespace MiniGameCollection.Games2026.Team02
         public void Update()
         {
             axisY = ArcadeInput.Players[(int)playerID].AxisY;
+            axisX = ArcadeInput.Players[(int)playerID].AxisX;
 
             // cooldown timers
             if (stunDT > 0) stunDT -= Time.deltaTime;
             if (attackDT > 0) attackDT -= Time.deltaTime;
-            if (attackResetDT > 0) attackResetDT -= Time.deltaTime;
             if (comboResetDT > 0) comboResetDT -= Time.deltaTime;
 
             // input switch | makes you have to re-press the button to do another action
             bool actionPressed = (ArcadeInput.Players[(int)playerID].Action1.Pressed);
             if (actionPressed && !actionWasPressed) Attack();
             actionWasPressed = actionPressed;
+
+            if (comboResetDT <= 0) comboCount = 0;
+
+            CounterAttack();
+
+            if (axisX != 0) lastX = axisX;
         }
 
         private bool Cooldown()
@@ -74,7 +85,6 @@ namespace MiniGameCollection.Games2026.Team02
             bool cooldown; // is the player currently on a meaningful cooldown
 
             if (attackDT > 0) cooldown = true; // if you are on CD from doing an attack
-            else if (attackResetDT > 0) cooldown = true; // if you are on CD from finishing a combo
             else cooldown = false; // if neither type of CD is active
 
             return cooldown;
@@ -95,30 +105,35 @@ namespace MiniGameCollection.Games2026.Team02
             if (Cooldown()) return;
 
             trueDamage = damage * damageMult[comboCount];
-            trueKB = kb * kbMult[comboCount];
+            trueKB = kb * lastX * kbMult[0];
             Combo();
         }
 
         private void Combo()
         {
+            bool finisher = false;
+
             attackDT = cds[comboCount];
             comboResetDT = cds[3];
 
             if (comboCount < comboMax) comboCount++;
-            if (comboCount >= comboMax) comboCount = 0;
-            if (comboResetDT == 0) comboCount = 0;
+            else { comboCount = 0; finisher = true; }
 
             if (!hitable) return;
 
             opponent2.stunDT = stunTime;
             opponent.playerHealth -= trueDamage;
+
+            if (!finisher) return;
+            finisher = false;
             opponent.rb2d.velocity = new Vector2(opponent.rb2d.velocity.x + trueKB, opponent.rb2d.velocity.y);
+            opponent2.counterTokens++;
         }
 
         private void UpAttack()
         {
             trueDamage = damage * damageMult[4]; // damage multiplied by attack amount
-            trueKB = kb * kbMult[4]; // damage multiplied by knockback
+            trueKB = kb * kbMult[1]; // damage multiplied by knockback
 
             if (Cooldown()) return; // check if the player is on cooldown or not
 
@@ -143,7 +158,7 @@ namespace MiniGameCollection.Games2026.Team02
         private void DownAttack()
         {
             trueDamage = damage * damageMult[5];
-            trueKB = kb * kbMult[5];
+            trueKB = kb * kbMult[2];
 
             if (Cooldown()) return;
 
@@ -169,6 +184,18 @@ namespace MiniGameCollection.Games2026.Team02
             else stunned = false;
 
             return stunned;
+        }
+
+        private void CounterAttack()
+        {
+            if (counterTokens >= counterTokenCap && Stun())
+            {
+                if (ArcadeInput.Players[(int)playerID].Action1.Pressed)
+                {
+                    comboCount = 3;
+                    BaseAttack();
+                }
+            }
         }
 
         private void OnTriggerEnter2D(Collider2D Collision)
