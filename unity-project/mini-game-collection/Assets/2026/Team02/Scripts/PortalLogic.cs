@@ -14,11 +14,10 @@ namespace MiniGameCollection.Games2026.Team02
             PlayerController player = collision.gameObject.GetComponent<PlayerController>();
             if (player != null && player.portalCooldown <= 0) // makes it only work if off cooldown and there is actually a player colliding
             {
-                // teleports the player to the chosen portals position, freezes them beifly and starts the cooldown for both
+                // teleports the player to the chosen portals position and starts the cooldown for both
                 player.portalCooldown = player.portalCooldownMax;
-                player.rb2d.position = targetLocation.position;
-                player.freeze = true;
-                player.freezeLength = player.freezeMax;
+                player.rb2d.position = new Vector2(targetLocation.position.x, targetLocation.position.y - 0.5f); // -0.5f smooths the movement after teleporting
+                player.playerHealth -= 1; // stops players from over-abusing portals
             }
         }
     }
