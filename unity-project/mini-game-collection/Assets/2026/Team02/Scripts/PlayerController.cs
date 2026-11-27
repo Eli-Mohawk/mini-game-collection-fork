@@ -13,25 +13,20 @@ namespace MiniGameCollection.Games2026.Team02
     {
         #region Variables
         // movement & jump variables
-        [SerializeField] private float moveSpeed;
-        [SerializeField] private float jumpHeight;
-        public bool isGrounded;
+        private float moveSpeed = 8;
+        private float jumpHeight = 15;
+        [NonSerialized] public bool isGrounded;
 
         public float playerHealth;
 
         // object related variables
         public PlayerID playerID;
         public Rigidbody2D rb2d;
-        public CombatSystem combatSystem;
+        [NonSerialized] public CombatSystem combatSystem;
 
         // portal cooldown variables
-        public float portalCooldownMax;
-        public float portalCooldown = 0;
-
-        // portal movement lock variables
-        public bool freeze;
-        public float freezeMax;
-        public float freezeLength = 0;
+        [NonSerialized] public float portalCooldownMax = 0.1f;
+        [NonSerialized] public float portalCooldown;
 
         private bool lose;
         #endregion
@@ -39,38 +34,25 @@ namespace MiniGameCollection.Games2026.Team02
         public void Start()
         {
             Physics2D.gravity = new Vector2(0, -9.81f); // sets the universal gravity to unity's default
+            combatSystem = GetComponent<CombatSystem>();
         }
 
         public void Update()
         {
             PlayerControls();
             HealthSystem();
-            #region Timers
             if (portalCooldown > 0) portalCooldown -= Time.deltaTime;
-            if (freezeLength > 0) freezeLength -= Time.deltaTime;
-            #endregion
         }
 
         private void PlayerControls()
         {
-            // freeze is in place to make a buffer after teleporting for better movement control
-            if (!freeze) // not frozen is default
-            {
-                float axisX = ArcadeInput.Players[(int)playerID].AxisX; // gets player input for each player
-                float movement = axisX * Time.deltaTime * moveSpeed;
-                rb2d.velocity = new Vector2(axisX * moveSpeed, rb2d.velocity.y); // gives velocity based on movement direction & set speed
+            float axisX = ArcadeInput.Players[(int)playerID].AxisX; // gets player input for each player
+            float movement = axisX * Time.deltaTime * moveSpeed;
 
-                
-            }
-            else if (freeze) // after using a portal you stop movement
-            {
-                rb2d.velocity = new Vector2(0, rb2d.velocity.y);
-            }
-            if (freezeLength <= 0)
-            {
-                freeze = false;
-            }
-
+            if (combatSystem.Stun()) return;
+            
+            rb2d.velocity = new Vector2(axisX * moveSpeed, rb2d.velocity.y); // gives velocity based on movement direction & set speed
+            
             if (ArcadeInput.Players[(int)playerID].Action2.Pressed && isGrounded)
             {
                 rb2d.velocity = new Vector2(rb2d.velocity.x, jumpHeight);
