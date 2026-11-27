@@ -1,4 +1,3 @@
-using JetBrains.Annotations;
 using MiniGameCollection.Games2025.Team00;
 using System;
 using System.Collections;
@@ -16,12 +15,9 @@ namespace MiniGameCollection.Games2026.Team02
     {
         // external variables
         public PlayerID playerID;
-        private PlayerController player;
-        private float axisY;
-        private float axisX;
-        private float lastX;
-        private PlayerController opponent;
-        private CombatSystem opponent2;
+        PlayerController player;
+        float axisY;
+        PlayerController opponent;
 
         // attack variables
         private bool hitable; // can you deal damage
@@ -29,27 +25,25 @@ namespace MiniGameCollection.Games2026.Team02
         private int comboMax = 3; // max amount of hits in a combo -1 (for math)
 
         // attack cooldown variables
+        private float attackResetDT; // delta time left until you can attack after finishing combo
         private float comboResetDT; // delta time left until combo is reset
         private float attackDT; // delta time left between attacks in combo
-        private float[] cds = { 0.3f, 0.4f, 0.8f, 2f, 1.1f, 1.1f }; // combo 1, 2, 3, 4/reset, up, down
+        [SerializeField] private float[] cds = { 0.5f, 0.5f, 0.7f, 2f, 0.5f, 0.6f }; // combo 1, 2, 3, 4/reset, up, down
 
         // stun variables
-        private float stunTime = 1f; // duration of stun
-        [NonSerialized] public float stunDT; // delta time left of stun
+        [SerializeField] private float stunTime; // duration of stun
+        private float stunDT; // delta time left of stun
+        public bool stunned = false; // are they stunned
 
         // knockback variables
-        private float kb = 1; // kbockback applied
+        [SerializeField] private float kb = 5; // kbockback applied to opponent
         private float trueKB; // final knockback applied
-        private float[] kbMult = {6.5f, 12.5f, 15f}; // combo 4, up, down
+        [SerializeField] private float[] kbMult = {0.5f, 0.3f, 0.8f, 1.4f, 4f, 5f}; // combo 1, 2, 3, 4, up, down
 
         // damage calculations
-        private float damage = 5f; // base damage
+        [SerializeField] private float damage = 5f; // base damage
         private float trueDamage; // actuall damage dealt
-        private float[] damageMult = {0.5f, 0.3f, 0.7f, 1.5f, 1f, 1f}; // combo 1, 2, 3, 4, up, down
-
-        // counter-attack variables
-        [NonSerialized] public int counterTokens;
-        private int counterTokenCap = 2;
+        [SerializeField] private float[] damageMult = {0.6f, 0.4f, 0.8f, 1.1f, 0.9f, 1f}; // combo 1, 2, 3, 4, up, down
 
         private bool actionWasPressed;
 
@@ -61,11 +55,11 @@ namespace MiniGameCollection.Games2026.Team02
         public void Update()
         {
             axisY = ArcadeInput.Players[(int)playerID].AxisY;
-            axisX = ArcadeInput.Players[(int)playerID].AxisX;
 
             // cooldown timers
             if (stunDT > 0) stunDT -= Time.deltaTime;
             if (attackDT > 0) attackDT -= Time.deltaTime;
+            if (attackResetDT > 0) attackResetDT -= Time.deltaTime;
             if (comboResetDT > 0) comboResetDT -= Time.deltaTime;
 
             // input switch | makes you have to re-press the button to do another action
@@ -73,11 +67,7 @@ namespace MiniGameCollection.Games2026.Team02
             if (actionPressed && !actionWasPressed) Attack();
             actionWasPressed = actionPressed;
 
-            if (comboResetDT <= 0) comboCount = 0;
-
-            CounterAttack();
-
-            if (axisX != 0) lastX = axisX;
+            Debug.Log(hitable);
         }
 
         private bool Cooldown()
@@ -85,6 +75,7 @@ namespace MiniGameCollection.Games2026.Team02
             bool cooldown; // is the player currently on a meaningful cooldown
 
             if (attackDT > 0) cooldown = true; // if you are on CD from doing an attack
+            else if (attackResetDT > 0) cooldown = true; // if you are on CD from finishing a combo
             else cooldown = false; // if neither type of CD is active
 
             return cooldown;
@@ -92,7 +83,7 @@ namespace MiniGameCollection.Games2026.Team02
 
         public void Attack()
         {
-            if (Stun()) return;
+            if (stunned) return;
 
             // attack types
             if (axisY == 0) BaseAttack();
@@ -105,35 +96,29 @@ namespace MiniGameCollection.Games2026.Team02
             if (Cooldown()) return;
 
             trueDamage = damage * damageMult[comboCount];
-            trueKB = kb * lastX * kbMult[0];
+            trueKB = kb * kbMult[comboCount];
             Combo();
         }
 
         private void Combo()
         {
-            bool finisher = false;
-
             attackDT = cds[comboCount];
             comboResetDT = cds[3];
 
             if (comboCount < comboMax) comboCount++;
-            else { comboCount = 0; finisher = true; }
+            if (comboCount >= comboMax) comboCount = 0;
+            if (comboResetDT == 0) comboCount = 0;
 
             if (!hitable) return;
 
-            opponent2.stunDT = stunTime;
             opponent.playerHealth -= trueDamage;
-
-            if (!finisher) return;
-            finisher = false;
             opponent.rb2d.velocity = new Vector2(opponent.rb2d.velocity.x + trueKB, opponent.rb2d.velocity.y);
-            opponent2.counterTokens++;
         }
 
         private void UpAttack()
         {
             trueDamage = damage * damageMult[4]; // damage multiplied by attack amount
-            trueKB = kb * kbMult[1]; // damage multiplied by knockback
+            trueKB = kb * kbMult[4]; // damage multiplied by knockback
 
             if (Cooldown()) return; // check if the player is on cooldown or not
 
@@ -145,8 +130,7 @@ namespace MiniGameCollection.Games2026.Team02
             comboCount = 3;
 
             if (!hitable) return; // only does the following if actually hitting the enemy
-
-            opponent2.stunDT = stunTime;
+            
             opponent.playerHealth -= trueDamage;
 
             // makes both player go up into the air
@@ -158,7 +142,7 @@ namespace MiniGameCollection.Games2026.Team02
         private void DownAttack()
         {
             trueDamage = damage * damageMult[5];
-            trueKB = kb * kbMult[2];
+            trueKB = kb * kbMult[5];
 
             if (Cooldown()) return;
 
@@ -170,38 +154,19 @@ namespace MiniGameCollection.Games2026.Team02
 
             if (!hitable) return;
 
-            opponent2.stunDT = stunTime;
             opponent.playerHealth -= trueDamage;
 
             opponent.rb2d.velocity = new Vector2(opponent.rb2d.velocity.x, opponent.rb2d.velocity.y - trueKB);
         }
 
-        public bool Stun()
+        private void Stun()
         {
-            bool stunned;
-
-            if (stunDT > 0) stunned = true;
-            else stunned = false;
-
-            return stunned;
-        }
-
-        private void CounterAttack()
-        {
-            if (counterTokens >= counterTokenCap && Stun())
-            {
-                if (ArcadeInput.Players[(int)playerID].Action1.Pressed)
-                {
-                    comboCount = 3;
-                    BaseAttack();
-                }
-            }
+            
         }
 
         private void OnTriggerEnter2D(Collider2D Collision)
         {
             if (opponent == null) opponent = Collision.GetComponent<PlayerController>();
-            if (opponent2 == null) opponent2 = Collision.GetComponent<CombatSystem>();
             
             if (opponent != null) hitable = true;
         }
