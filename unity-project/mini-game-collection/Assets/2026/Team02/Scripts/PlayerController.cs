@@ -11,6 +11,9 @@ namespace MiniGameCollection.Games2026.Team02
 {
     public class PlayerController : MiniGameBehaviour
     {
+        [SerializeField] private Animator animator;
+        
+        private float axisX;
         #region Variables
         // movement & jump variables
         private float moveSpeed = 8;
@@ -46,8 +49,14 @@ namespace MiniGameCollection.Games2026.Team02
 
         private void PlayerControls()
         {
-            float axisX = ArcadeInput.Players[(int)playerID].AxisX; // gets player input for each player
-            float movement = axisX * Time.deltaTime * moveSpeed;
+            if (combatSystem.stunned) return;
+
+            // freeze is in place to make a buffer after teleporting for better movement control
+            if (!freeze) // not frozen is default
+            {
+                axisX = ArcadeInput.Players[(int)playerID].AxisX; // gets player input for each player
+                float movement = axisX * Time.deltaTime * moveSpeed;
+                rb2d.velocity = new Vector2(axisX * moveSpeed, rb2d.velocity.y); // gives velocity based on movement direction & set speed
 
             if (combatSystem.Stun()) return;
             
@@ -56,6 +65,22 @@ namespace MiniGameCollection.Games2026.Team02
             if (ArcadeInput.Players[(int)playerID].Action2.Pressed && isGrounded)
             {
                 rb2d.velocity = new Vector2(rb2d.velocity.x, jumpHeight);
+            }
+
+            if (axisX >= 0.1) //makes it so the animation plays when moving
+            {
+                animator.SetBool("P1Running", true);
+                animator.SetBool("P2Running", true);
+            }
+            else if (axisX < 0.1)
+            {
+                animator.SetBool("P1Running", true);
+                animator.SetBool("P2Running", true);
+            }
+            else
+            {
+                animator.SetBool("P1Running", false);
+                animator.SetBool("P2Running", false);
             }
         }
 
