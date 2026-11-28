@@ -23,6 +23,7 @@ namespace MiniGameCollection.Games2026.Team02
         public PlayerID playerID;
         public Rigidbody2D rb2d;
         [NonSerialized] public CombatSystem combatSystem;
+        private SpriteRenderer sprite;
 
         // portal cooldown variables
         [NonSerialized] public float portalCooldownMax = 0.1f;
@@ -32,12 +33,14 @@ namespace MiniGameCollection.Games2026.Team02
         #endregion
         [SerializeField] private Animator animator;
 
-        private float xPosLastFrame;
+        private float axisX;
+        private float lastX;
 
         public void Start()
         {
             Physics2D.gravity = new Vector2(0, -9.81f); // sets the universal gravity to unity's default
             combatSystem = GetComponent<CombatSystem>();
+            sprite = GetComponent<SpriteRenderer>();
         }
 
         public void Update()
@@ -46,12 +49,15 @@ namespace MiniGameCollection.Games2026.Team02
             HealthSystem();
             if (portalCooldown > 0) portalCooldown -= Time.deltaTime;
 
+            if (axisX != 0) lastX = axisX;
+            if (lastX == -1) sprite.flipX = true;
+            else if (lastX == 1) sprite.flipX = false;
         }
         
 
         private void PlayerControls()
         {
-            float axisX = ArcadeInput.Players[(int)playerID].AxisX; // gets player input for each player
+            axisX = ArcadeInput.Players[(int)playerID].AxisX; // gets player input for each player
             float movement = axisX * Time.deltaTime * moveSpeed;
 
             if (combatSystem.Stun()) return;
