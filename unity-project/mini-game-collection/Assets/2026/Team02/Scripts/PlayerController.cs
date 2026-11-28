@@ -30,6 +30,9 @@ namespace MiniGameCollection.Games2026.Team02
 
         private bool lose;
         #endregion
+        [SerializeField] private Animator animator;
+
+        private float xPosLastFrame;
 
         public void Start()
         {
@@ -42,7 +45,9 @@ namespace MiniGameCollection.Games2026.Team02
             PlayerControls();
             HealthSystem();
             if (portalCooldown > 0) portalCooldown -= Time.deltaTime;
+
         }
+        
 
         private void PlayerControls()
         {
@@ -56,6 +61,17 @@ namespace MiniGameCollection.Games2026.Team02
             if (ArcadeInput.Players[(int)playerID].Action2.Pressed && isGrounded)
             {
                 rb2d.velocity = new Vector2(rb2d.velocity.x, jumpHeight);
+            }
+
+            if (axisX != 0)
+            {
+                animator.SetBool("P1Running", true);
+                animator.SetBool("P2Running", true);
+            }
+            else 
+            {
+                animator.SetBool("P1Running", false);
+                animator.SetBool("P2Running", false);
             }
         }
 
